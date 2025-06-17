@@ -24,6 +24,7 @@
     "react-hook-form": "^7.56.4",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.30.0",
+    "swiper": "^11.2.8",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.7",
     "yup": "^1.6.1"
