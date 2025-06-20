@@ -1,3 +1,4 @@
+import MovieDetailsComponent from "@/components/movieDetails";
 import React from "react";
 import { useParams } from "react-router-dom";
 
@@ -8,6 +9,8 @@ export default function MovieDetails() {
     <div>
       <h1>Movie Details</h1>
       <p>Movie ID: {id}</p>
+
+      <MovieDetailsComponent id={id} />
     </div>
   );
 }

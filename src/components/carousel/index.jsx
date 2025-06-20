@@ -5,6 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Carousel() {
   const [movies, setMovies] = useState([]);

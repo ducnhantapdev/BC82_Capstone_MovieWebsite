@@ -77,7 +77,7 @@ export default function HomeLayout({ children }) {
           </div>
         </div>
         <div className="mt-8 text-center text-sm text-gray-500">
-          © 2025 MovieHub. Thiết kế bởi bạn & ChatGPT
+          © 2025 MovieHub.
         </div>
       </footer>
     </div>
