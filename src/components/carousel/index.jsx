@@ -1,15 +1,15 @@
 import { listMovieAPI } from "@/apis/movie";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
-import { useDispatch, useSelector } from "react-redux";
 
 export default function Carousel() {
   const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   console.log("movies", movies);
 
@@ -19,16 +19,18 @@ export default function Carousel() {
 
   const fetchMovie = async () => {
     try {
-      setLoading(true);
       const response = await listMovieAPI();
       console.log("danh sach:", response.items);
       setMovies(response.items);
     } catch (error) {
       console.error("Error fetching movies:", error);
-    } finally {
-      setLoading(false);
     }
   };
+
+  const handleMovieClick = (movieId) => {
+    navigate(`/movie-details/${movieId}`);
+  };
+
   return (
     <div>
       {/* Movie Carousel */}
@@ -48,7 +50,10 @@ export default function Carousel() {
         >
           {movies.map((movie) => (
             <SwiperSlide key={movie.maPhim}>
-              <div className="hover:scale-105 transition-transform duration-300 cursor-pointer w-full">
+              <div
+                className="hover:scale-105 transition-transform duration-300 cursor-pointer w-full"
+                onClick={() => handleMovieClick(movie.maPhim)}
+              >
                 <img
                   src={movie.hinhAnh}
                   alt={movie.tenPhim}

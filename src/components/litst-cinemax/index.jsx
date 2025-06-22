@@ -46,14 +46,6 @@ export default function ListMovies() {
           </div>
         ))}
       </div>
-      <div className="text-center mt-8">
-        <a
-          href="#"
-          className="text-yellow-400 hover:underline text-lg inline-flex items-center"
-        >
-          Xem Danh Sách Rạp <span className="ml-1">➤</span>
-        </a>
-      </div>
     </section>
   );
 }

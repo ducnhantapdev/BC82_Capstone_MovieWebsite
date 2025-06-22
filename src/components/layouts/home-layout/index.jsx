@@ -1,14 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { PATH } from "@/routes/path";
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 export default function HomeLayout({ children }) {
+  const navigate = useNavigate();
+
+  const handleMovieHubClick = () => {
+    navigate(PATH.HOME);
+  };
+
   return (
     <div className="bg-black text-white min-h-screen font-sans">
       {/* Header */}
       <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-black via-black/80 to-transparent px-8 py-4 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-red-600">MovieHub</h1>
+        <h1
+          className="text-3xl font-bold text-red-600 cursor-pointer hover:text-red-400 transition-colors"
+          onClick={handleMovieHubClick}
+        >
+          MovieHub
+        </h1>
         <nav className="space-x-6 text-lg">
           <a href="#" className="hover:text-red-400">
             Home
@@ -28,7 +39,10 @@ export default function HomeLayout({ children }) {
       <footer className="bg-gray-900 mt-16 px-8 py-12 text-gray-300">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h4 className="text-xl font-semibold mb-4 text-red-500">
+            <h4
+              className="text-xl font-semibold mb-4 text-red-500 cursor-pointer hover:text-red-400 transition-colors"
+              onClick={handleMovieHubClick}
+            >
               MovieHub
             </h4>
             <p className="text-sm">

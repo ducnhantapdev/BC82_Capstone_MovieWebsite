@@ -6,5 +6,6 @@ export const store = configureStore({
     hoTen: () => {
       return "Nhan";
     },
+    movieSeats,
   },
 });

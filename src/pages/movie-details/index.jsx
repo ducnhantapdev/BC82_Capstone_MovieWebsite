@@ -6,10 +6,7 @@ export default function MovieDetails() {
   const { id } = useParams();
 
   return (
-    <div>
-      <h1>Movie Details</h1>
-      <p>Movie ID: {id}</p>
-
+    <div className="py-20">
       <MovieDetailsComponent id={id} />
     </div>
   );
