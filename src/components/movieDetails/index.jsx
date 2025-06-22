@@ -2,12 +2,16 @@ import { getMovieById } from "@/apis/getMovieById";
 import { getShowtimesByMovie } from "@/apis/showtime";
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
 
 export default function MovieDetailsComponent(props) {
   const [movie, setMovie] = useState(null);
   const [showtimes, setShowtimes] = useState(null);
   const [selectedSystem, setSelectedSystem] = useState(null);
   const [selectedTheater, setSelectedTheater] = useState(null);
+  const [selectedShowtime, setSelectedShowtime] = useState(null);
+  const navigate = useNavigate();
 
   const { id } = props;
 
@@ -19,14 +23,33 @@ export default function MovieDetailsComponent(props) {
     getShowtimesByMovie(id).then((data) => {
       setShowtimes(data);
       if (data?.heThongRapChieu?.length > 0) {
-        setSelectedSystem(data.heThongRapChieu[0]);
+        const firstSystem = data.heThongRapChieu[0];
+        setSelectedSystem(firstSystem);
       }
     });
   }, [id]);
 
   const handleSelectSystem = (system) => {
     setSelectedSystem(system);
-    setSelectedTheater(null);
+    if (system.cumRapChieu?.length > 0) {
+      setSelectedTheater(system.cumRapChieu[0]);
+    } else {
+      setSelectedTheater(null);
+    }
+    setSelectedShowtime(null);
+  };
+
+  const handleSelectTheater = (theater) => {
+    setSelectedTheater(theater);
+    setSelectedShowtime(null);
+  };
+
+  const handleBooking = () => {
+    if (selectedShowtime) {
+      navigate(`/ticket/${selectedShowtime.maLichChieu}`);
+    } else {
+      alert("Vui lòng chọn suất chiếu trước khi đặt vé!");
+    }
   };
 
   const formatDateAndTime = (dateString) => {
@@ -96,7 +119,22 @@ export default function MovieDetailsComponent(props) {
             alt={movie.tenPhim}
             className="w-full h-auto rounded-lg shadow-lg object-cover"
           />
+          <div className="flex justify-around pt-8">
+            <Button className="bg-blue-500 opacity-50 cursor-not-allowed">
+              {movie.dangChieu ? "Đang chiếu" : " Sắp chiếu"}
+            </Button>
+            <Button
+              className={`bg-red-600 hover:bg-red-700 ${
+                !selectedShowtime && "opacity-50 cursor-not-allowed"
+              }`}
+              onClick={handleBooking}
+              disabled={!selectedShowtime}
+            >
+              Đặt vé
+            </Button>
+          </div>
         </div>
+
         <div className="md:col-span-2 space-y-4">
           <h1 className="text-3xl font-bold text-white">{movie.tenPhim}</h1>
           <iframe
@@ -148,7 +186,7 @@ export default function MovieDetailsComponent(props) {
             {selectedSystem?.cumRapChieu.map((theater) => (
               <li
                 key={theater.maCumRap}
-                onClick={() => setSelectedTheater(theater)}
+                onClick={() => handleSelectTheater(theater)}
                 className={`p-3 rounded-lg cursor-pointer transition-all ${
                   selectedTheater?.maCumRap === theater.maCumRap
                     ? "bg-blue-600/80 shadow-lg"
@@ -175,10 +213,16 @@ export default function MovieDetailsComponent(props) {
                     {date}
                   </h3>
                   <div className="flex flex-wrap gap-2">
+                    <p> Chọn suất chiếu:</p>
                     {shows.map((show) => (
                       <button
                         key={show.maLichChieu}
-                        className="px-3 py-1 bg-gray-700 hover:bg-red-600 rounded-md text-sm font-medium transition-colors"
+                        onClick={() => setSelectedShowtime(show)}
+                        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                          selectedShowtime?.maLichChieu === show.maLichChieu
+                            ? "bg-red-600 text-white shadow-lg"
+                            : "bg-gray-700 hover:bg-red-500"
+                        }`}
                       >
                         {show.time}
                       </button>

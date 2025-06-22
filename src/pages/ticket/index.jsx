@@ -1,221 +1,214 @@
-import React from "react";
+import { getPhongVe } from "@/apis/ticket";
+import React, { Fragment, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { FaChair } from "react-icons/fa";
+import { MdClose } from "react-icons/md";
 
-import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { datGhe } from "../../redux/slice/movieSeats.slice";
-
-export default function Ticket() {
-  const [name, setName] = useState("");
-  const [seatCount, setSeatCount] = useState("");
-  const [selectedSeats, setSelectedSeats] = useState([]);
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [bookingList, setBookingList] = useState([]);
-  const [bookedSeats, setBookedSeats] = useState([]);
-
-  const dataRedux = useSelector((state) => {
-    return state.movieSeats.danhSachGhe;
-  });
-  const dispatch = useDispatch();
-
-  const handleStartSelecting = () => {
-    if (!name || !seatCount) {
-      alert("Vui lòng nhập đầy đủ họ tên và số lượng ghế!");
-      return;
-    } else {
-      alert("Thành công ! bắt đầu chọn ghế");
-      setIsSelecting(true);
-      setSelectedSeats([]); // Reset danh sách ghế đã chọn
+const Seat = ({ seatInfo, onSelect, isSelected }) => {
+  const getSeatClass = () => {
+    let baseClass =
+      "w-8 h-8 m-1 flex items-center justify-center rounded-md text-xs transition-all";
+    if (seatInfo.daDat) {
+      return `${baseClass} bg-gray-600 text-gray-400 cursor-not-allowed`;
     }
-  };
-
-  const handleSeatClick = (seat) => {
-    if (seat.daDat || bookedSeats.includes(seat.soGhe)) return;
-    if (!isSelecting) {
-      alert("Vui lòng nhấn Start Selecting trước khi chọn ghế!");
-      return;
+    if (isSelected) {
+      return `${baseClass} bg-orange-500 text-white shadow-lg shadow-orange-500/50`;
     }
-
-    if (selectedSeats.find((item) => item.soGhe === seat.soGhe)) {
-      setSelectedSeats(
-        selectedSeats.filter((item) => item.soGhe !== seat.soGhe)
-      );
-    } else {
-      if (selectedSeats.length >= parseInt(seatCount)) {
-        alert(`Bạn chỉ được chọn tối đa ${seatCount} ghế!`);
-        return;
-      }
-      setSelectedSeats([...selectedSeats, seat]);
+    if (seatInfo.loaiGhe === "Vip") {
+      return `${baseClass} bg-green-500 hover:bg-green-400 text-white cursor-pointer`;
     }
-  };
-
-  const handleConfirm = () => {
-    if (selectedSeats.length !== parseInt(seatCount)) {
-      alert(`Vui lòng chọn đủ ${seatCount} ghế!`);
-      return;
-    }
-
-    // Tính tiền ghế
-    const totalAmount = selectedSeats.reduce(
-      (total, seat) => total + seat.gia,
-      0
-    );
-
-    // Thêm thông tin vào bảng
-    setBookingList([
-      ...bookingList,
-      {
-        name,
-        seatCount,
-        seats: selectedSeats.map((seat) => seat.soGhe).join(", "),
-        totalAmount: totalAmount.toLocaleString("vi-VN") + " VNĐ",
-      },
-    ]);
-
-    // Thêm các ghế đã chọn vào danh sách ghế đã đặt
-    setBookedSeats([
-      ...bookedSeats,
-      ...selectedSeats.map((seat) => seat.soGhe),
-    ]);
-
-    // Cập nhật trạng thái daDat của các ghế đã chọn
-    selectedSeats.forEach((seat) => {
-      dispatch(
-        datGhe({
-          soGhe: seat.soGhe,
-          daDat: true,
-        })
-      );
-    });
-
-    // Reset form
-    setName("");
-    setSeatCount("");
-    setSelectedSeats([]);
-    setIsSelecting(false);
+    return `${baseClass} bg-gray-700 hover:bg-gray-600 text-gray-300 cursor-pointer`;
   };
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center flex items-center justify-center p-6"
-      style={{
-        backgroundImage: "url('https://source.unsplash.com/1600x900/?cinema')",
-      }}
+    <button
+      className={getSeatClass()}
+      disabled={seatInfo.daDat}
+      onClick={() => onSelect(seatInfo)}
     >
-      <div className="bg-black bg-opacity-80 p-8 rounded-md w-full max-w-4xl text-white">
-        <h2 className="text-orange-500 text-lg mb-4">
-          Fill The Required Details Below And Select Your Seats
-        </h2>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label>Name *</label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full p-2 bg-transparent border border-gray-400 text-white"
-            />
-          </div>
-          <div>
-            <label>Number of Seats *</label>
-            <input
-              value={seatCount}
-              onChange={(e) => setSeatCount(e.target.value)}
-              type="number"
-              className="w-full p-2 bg-transparent border border-gray-400 text-white"
-            />
-          </div>
-        </div>
-        <button
-          className="bg-white text-black px-4 py-2 rounded mb-6"
-          onClick={handleStartSelecting}
-        >
-          Start Selecting
-        </button>
+      {seatInfo.daDat ? <MdClose /> : seatInfo.tenGhe}
+    </button>
+  );
+};
 
-        <div className="flex gap-4 mb-4 justify-center">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500"></div> Selected Seat
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-500"></div> Reserved Seat
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-yellow-300"></div> Empty Seat
-          </div>
-        </div>
+export default function Ticket() {
+  const { showtimeId } = useParams();
+  const [ticketRoom, setTicketRoom] = useState(null);
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes
 
-        <div className="overflow-x-auto flex justify-center">
-          <div className="inline-block">
-            <div className="grid grid-cols-13 gap-2 text-center text-white"></div>
-            {dataRedux.map((row, index) => (
-              <div key={index} className="flex items-center">
-                <span className="w-8 text-right pr-2 ">{row.hang}</span>
-                {row.danhSachGhe.map((seat, seatIndex) => (
-                  <button
-                    key={seatIndex}
-                    className={`w-10 h-10 m-1 rounded ${
-                      index === 0
-                        ? ""
-                        : seat.daDat || bookedSeats.includes(seat.soGhe)
-                        ? "bg-red-500 cursor-not-allowed"
-                        : selectedSeats.find(
-                            (item) => item.soGhe === seat.soGhe
-                          )
-                        ? "bg-green-500"
-                        : "bg-yellow-300 hover:bg-green-500"
-                    }`}
-                    disabled={seat.daDat || bookedSeats.includes(seat.soGhe)}
-                    onClick={() => handleSeatClick(seat)}
-                  >
-                    {seat.soGhe}
-                  </button>
-                ))}
+  useEffect(() => {
+    getPhongVe(showtimeId).then((data) => {
+      setTicketRoom(data);
+    });
+  }, [showtimeId]);
+
+  useEffect(() => {
+    if (timeRemaining <= 0) return;
+    const timer = setInterval(() => {
+      setTimeRemaining((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [timeRemaining]);
+
+  const handleSelectSeat = (seat) => {
+    setSelectedSeats((prev) => {
+      const isSelected = prev.some((s) => s.maGhe === seat.maGhe);
+      if (isSelected) {
+        return prev.filter((s) => s.maGhe !== seat.maGhe);
+      }
+      return [...prev, seat];
+    });
+  };
+
+  const handleBooking = () => {
+    if (selectedSeats.length === 0) {
+      alert("Vui lòng chọn ít nhất một ghế!");
+      return;
+    }
+
+    // In a real app, you would make an API call here to book the tickets.
+    // For this demo, we'll just simulate the success.
+
+    alert(
+      `Đặt vé thành công cho ${
+        selectedSeats.length
+      } ghế! Tổng tiền: ${totalPrice.toLocaleString("vi-VN")} đ`
+    );
+
+    // Update the UI to show seats as booked
+    const bookedSeatIds = selectedSeats.map((s) => s.maGhe);
+    setTicketRoom((prev) => ({
+      ...prev,
+      danhSachGhe: prev.danhSachGhe.map((seat) =>
+        bookedSeatIds.includes(seat.maGhe) ? { ...seat, daDat: true } : seat
+      ),
+    }));
+
+    // Clear selection
+    setSelectedSeats([]);
+  };
+
+  if (!ticketRoom) return <div>Đang tải thông tin phòng vé...</div>;
+
+  const { thongTinPhim, danhSachGhe } = ticketRoom;
+  const totalPrice = selectedSeats.reduce((acc, seat) => acc + seat.giaVe, 0);
+
+  const renderSeats = () => {
+    const seats = [];
+    for (let i = 0; i < danhSachGhe.length; i += 16) {
+      seats.push(danhSachGhe.slice(i, i + 16));
+    }
+    const rowLetters = "ABCDEFGHIJ".split("");
+
+    return seats.map((row, rowIndex) => (
+      <div key={rowIndex} className="flex items-center">
+        <div className="w-8 text-center font-bold text-gray-400">
+          {rowLetters[rowIndex]}
+        </div>
+        <div className="flex">
+          {row.map((seat) => (
+            <Seat
+              key={seat.maGhe}
+              seatInfo={seat}
+              onSelect={handleSelectSeat}
+              isSelected={selectedSeats.some((s) => s.maGhe === seat.maGhe)}
+            />
+          ))}
+        </div>
+      </div>
+    ));
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white flex justify-center items-center p-4">
+      <div className="grid grid-cols-12 gap-6 w-full max-w-7xl">
+        {/* Left - Seat Selection */}
+        <div className="col-span-8 bg-gray-900 p-6 rounded-lg shadow-lg">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h2 className="text-xl font-bold">{thongTinPhim.tenCumRap}</h2>
+              <p className="text-sm text-gray-400">
+                {thongTinPhim.ngayChieu} - {thongTinPhim.gioChieu} -{" "}
+                {thongTinPhim.tenRap}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-400">Thời gian giữ ghế</p>
+              <p className="text-2xl font-bold text-red-500">
+                {`${Math.floor(timeRemaining / 60)}`.padStart(2, "0")}:
+                {`${timeRemaining % 60}`.padStart(2, "0")}
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-black py-2 text-center text-white rounded-t-lg shadow-inner-top">
+            Màn hình
+          </div>
+          <div className="flex flex-col items-center py-6">{renderSeats()}</div>
+
+          <div className="flex justify-center space-x-6 mt-4">
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-gray-700 rounded-md mr-2"></div>
+              <span>Ghế thường</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-green-500 rounded-md mr-2"></div>
+              <span>Ghế VIP</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-orange-500 rounded-md mr-2"></div>
+              <span>Ghế đang chọn</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-gray-600 flex items-center justify-center rounded-md mr-2">
+                <MdClose />
               </div>
-            ))}
+              <span>Ghế đã đặt</span>
+            </div>
           </div>
         </div>
 
-        <div className="mt-6 w-full text-center bg-orange-500 text-black py-2 font-bold tracking-widest">
-          SCREEN THIS WAY
-        </div>
+        {/* Right - Booking Summary */}
+        <div className="col-span-4 bg-gray-900 p-6 rounded-lg shadow-lg flex flex-col">
+          <h2 className="text-3xl font-bold text-center mb-6 text-green-400">
+            {totalPrice.toLocaleString("vi-VN")} đ
+          </h2>
 
-        <div className="mt-6 text-center">
+          <div className="space-y-4 text-sm flex-grow">
+            <div className="border-b border-gray-700 pb-2">
+              <span className="font-bold text-lg">{thongTinPhim.tenPhim}</span>
+            </div>
+            <div>
+              <strong>Cụm rạp:</strong> {thongTinPhim.tenCumRap}
+            </div>
+            <div>
+              <strong>Ngày giờ chiếu:</strong> {thongTinPhim.ngayChieu} -{" "}
+              {thongTinPhim.gioChieu}
+            </div>
+            <div>
+              <strong>Rạp:</strong> {thongTinPhim.tenRap}
+            </div>
+            <div className="flex flex-wrap items-center">
+              <strong className="mr-2">Ghế chọn:</strong>
+              {selectedSeats.map((s) => s.tenGhe).join(", ")}
+            </div>
+            <div>
+              <strong>Ưu đãi:</strong> 0%
+            </div>
+          </div>
+
           <button
-            className="bg-white text-black px-6 py-2 rounded"
-            onClick={handleConfirm}
+            onClick={handleBooking}
+            disabled={selectedSeats.length === 0}
+            className={`w-full font-bold py-3 rounded-lg mt-6 transition-all ${
+              selectedSeats.length > 0
+                ? "bg-orange-600 hover:bg-orange-700 text-white"
+                : "bg-gray-700 text-gray-500 cursor-not-allowed"
+            }`}
           >
-            Confirm Selection
+            ĐẶT VÉ
           </button>
-        </div>
-
-        <div className="mt-6 overflow-x-auto">
-          <table className="min-w-full bg-white text-black border border-black">
-            <thead>
-              <tr>
-                <th className="border px-4 py-2">Name</th>
-                <th className="border px-4 py-2">Number of Seats</th>
-                <th className="border px-4 py-2">Seats</th>
-                <th className="border px-4 py-2">Total Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookingList.length === 0 ? (
-                <tr>
-                  <td className="border px-4 py-2 text-center" colSpan={4}>
-                    No data
-                  </td>
-                </tr>
-              ) : (
-                bookingList.map((item, idx) => (
-                  <tr key={idx}>
-                    <td className="border px-4 py-2">{item.name}</td>
-                    <td className="border px-4 py-2">{item.seatCount}</td>
-                    <td className="border px-4 py-2">{item.seats}</td>
-                    <td className="border px-4 py-2">{item.totalAmount}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

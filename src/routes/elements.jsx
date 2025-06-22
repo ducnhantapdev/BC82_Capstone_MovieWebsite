@@ -4,6 +4,7 @@ import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
 import HomePage from "@/pages/home";
 import MovieDetails from "@/pages/movie-details";
+import Ticket from "@/pages/ticket";
 
 import React from "react";
 import { useRoutes } from "react-router-dom";
@@ -60,6 +61,14 @@ const useRouterElements = () => {
         <DashboardLayout>
           <MovieManagement />
         </DashboardLayout>
+      ),
+    },
+    {
+      path: `${PATH.TICKET}/:showtimeId`,
+      element: (
+        <HomeLayout>
+          <Ticket />
+        </HomeLayout>
       ),
     },
     { path: PATH.NOT_FOUND, element: <div>404 Not Found</div> },
