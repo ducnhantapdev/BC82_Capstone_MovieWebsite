@@ -6,8 +6,22 @@ import { Outlet, useNavigate } from "react-router-dom";
 export default function HomeLayout({ children }) {
   const navigate = useNavigate();
 
+  // Lấy user từ localStorage
+  const user = React.useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  }, []);
+
   const handleMovieHubClick = () => {
     navigate(PATH.HOME);
+  };
+
+  const handleUserClick = () => {
+    if (user && user.hoTen) return;
+    navigate(PATH.LOGIN);
   };
 
   return (
@@ -27,9 +41,12 @@ export default function HomeLayout({ children }) {
           <a href="#" className="hover:text-red-400">
             Movies
           </a>
-          <a href="#" className="hover:text-red-400">
-            My List
-          </a>
+          <span
+            className="hover:text-red-400 cursor-pointer font-semibold"
+            onClick={handleUserClick}
+          >
+            {user && user.hoTen ? user.hoTen : "Đăng nhập"}
+          </span>
         </nav>
       </header>
 
