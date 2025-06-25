@@ -12,6 +12,7 @@ import { PATH } from "./path";
 import HomeLayout from "@/components/layouts/home-layout";
 import AuthLayout from "@/components/layouts/auth";
 import DashboardLayout from "@/components/layouts/dashboard";
+import ProtectedAdminRoute from "./ProtectedAdminRoute";
 
 const useRouterElements = () => {
   const elements = useRoutes([
@@ -48,20 +49,26 @@ const useRouterElements = () => {
       ),
     },
     {
-      path: PATH.USER_MANAGEMENT,
-      element: (
-        <DashboardLayout>
-          <UserManagement />
-        </DashboardLayout>
-      ),
-    },
-    {
-      path: PATH.MOVIE_MANAGEMENT,
-      element: (
-        <DashboardLayout>
-          <MovieManagement />
-        </DashboardLayout>
-      ),
+      path: "/",
+      element: <ProtectedAdminRoute />,
+      children: [
+        {
+          path: PATH.USER_MANAGEMENT,
+          element: (
+            <DashboardLayout>
+              <UserManagement />
+            </DashboardLayout>
+          ),
+        },
+        {
+          path: PATH.MOVIE_MANAGEMENT,
+          element: (
+            <DashboardLayout>
+              <MovieManagement />
+            </DashboardLayout>
+          ),
+        },
+      ],
     },
     {
       path: `${PATH.TICKET}/:showtimeId`,

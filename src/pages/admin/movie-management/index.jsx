@@ -1,4 +1,9 @@
-import { listMovieAPI, deleteMovieAPI, updateMovieAPI } from "@/apis/movie";
+import {
+  listMovieAPI,
+  deleteMovieAPI,
+  updateMovieAPI,
+  addMovieAPI,
+} from "@/apis/movie";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { FaEdit, FaTrash, FaCalendarAlt } from "react-icons/fa";
@@ -7,6 +12,19 @@ export default function MovieManagement() {
   const [page, setPage] = useState(1);
   const [editForm, setEditForm] = useState(null);
   const [showEdit, setShowEdit] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [addForm, setAddForm] = useState({
+    tenPhim: "",
+    trailer: "",
+    moTa: "",
+    ngayKhoiChieu: "",
+    dangChieu: false,
+    sapChieu: false,
+    hot: false,
+    danhGia: 0,
+    hinhAnh: null,
+    maNhom: "GP01",
+  });
   const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
     queryFn: () =>
@@ -34,25 +52,44 @@ export default function MovieManagement() {
       queryClient.invalidateQueries({ queryKey: ["movie-list"] });
     },
   });
+  const addMutation = useMutation({
+    mutationFn: (formData) => addMovieAPI(formData),
+    onSuccess: () => {
+      setShowAdd(false);
+      setAddForm({
+        tenPhim: "",
+        trailer: "",
+        moTa: "",
+        ngayKhoiChieu: "",
+        dangChieu: false,
+        sapChieu: false,
+        hot: false,
+        danhGia: 0,
+        hinhAnh: null,
+        maNhom: "GP01",
+      });
+      queryClient.invalidateQueries({ queryKey: ["movie-list"] });
+    },
+  });
+
+  function formatDateToDDMMYYYY(dateStr) {
+    if (!dateStr) return "";
+    const [year, month, day] = dateStr.split("-");
+    return `${day}/${month}/${year}`;
+  }
+
   return (
     <div>
       {" "}
       {/* Main Content */}
       <div className="flex-1 p-6">
-        {/* Top Bar */}
-        <div className="flex justify-end items-center mb-4">
-          <div className="w-8 h-8 bg-pink-300 text-white rounded-full flex items-center justify-center">
-            A
-          </div>
-          <a href="#" className="ml-2 text-blue-600 text-sm">
-            Đăng xuất
-          </a>
-        </div>
-
         {/* Title & Button */}
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-semibold">Quản lý Phim</h1>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            onClick={() => setShowAdd(true)}
+          >
             Thêm phim
           </button>
         </div>
@@ -284,6 +321,130 @@ export default function MovieManagement() {
             </button>
             {updateMutation.isError && (
               <div className="text-red-500 text-sm">Cập nhật thất bại!</div>
+            )}
+          </form>
+        </div>
+      )}
+      {/* Modal thêm phim */}
+      {showAdd && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <form
+            className="bg-white p-6 rounded-lg w-full max-w-md space-y-4 relative"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData();
+              Object.entries(addForm).forEach(([key, value]) => {
+                if (key === "ngayKhoiChieu") {
+                  formData.append(key, formatDateToDDMMYYYY(value));
+                } else {
+                  formData.append(key, value);
+                }
+              });
+              addMutation.mutate(formData);
+            }}
+          >
+            <button
+              type="button"
+              className="absolute top-2 right-2 text-xl"
+              onClick={() => setShowAdd(false)}
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-bold mb-2">Thêm phim mới</h2>
+            <input
+              className="border p-2 w-full"
+              placeholder="Tên phim"
+              value={addForm.tenPhim}
+              onChange={(e) =>
+                setAddForm((f) => ({ ...f, tenPhim: e.target.value }))
+              }
+              required
+            />
+            <input
+              className="border p-2 w-full"
+              placeholder="Trailer"
+              value={addForm.trailer}
+              onChange={(e) =>
+                setAddForm((f) => ({ ...f, trailer: e.target.value }))
+              }
+            />
+            <textarea
+              className="border p-2 w-full"
+              placeholder="Mô tả"
+              value={addForm.moTa}
+              onChange={(e) =>
+                setAddForm((f) => ({ ...f, moTa: e.target.value }))
+              }
+            />
+            <input
+              className="border p-2 w-full"
+              type="date"
+              value={addForm.ngayKhoiChieu}
+              onChange={(e) =>
+                setAddForm((f) => ({ ...f, ngayKhoiChieu: e.target.value }))
+              }
+              required
+            />
+            <input
+              className="border p-2 w-full"
+              type="number"
+              min="0"
+              max="10"
+              placeholder="Đánh giá"
+              value={addForm.danhGia}
+              onChange={(e) =>
+                setAddForm((f) => ({ ...f, danhGia: e.target.value }))
+              }
+            />
+            <input
+              className="border p-2 w-full"
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setAddForm((f) => ({ ...f, hinhAnh: e.target.files[0] }))
+              }
+            />
+            <div className="flex gap-2">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={addForm.dangChieu}
+                  onChange={(e) =>
+                    setAddForm((f) => ({ ...f, dangChieu: e.target.checked }))
+                  }
+                />{" "}
+                Đang chiếu
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={addForm.sapChieu}
+                  onChange={(e) =>
+                    setAddForm((f) => ({ ...f, sapChieu: e.target.checked }))
+                  }
+                />{" "}
+                Sắp chiếu
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={addForm.hot}
+                  onChange={(e) =>
+                    setAddForm((f) => ({ ...f, hot: e.target.checked }))
+                  }
+                />{" "}
+                Hot
+              </label>
+            </div>
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded w-full"
+              type="submit"
+              disabled={addMutation.isLoading}
+            >
+              {addMutation.isLoading ? "Đang thêm..." : "Thêm phim"}
+            </button>
+            {addMutation.isError && (
+              <div className="text-red-500 text-sm">Thêm phim thất bại!</div>
             )}
           </form>
         </div>

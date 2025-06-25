@@ -1,6 +1,22 @@
+import { PATH } from "@/routes/path";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function DasboardLayout({ children }) {
+  const navigate = useNavigate();
+  const user = React.useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate(PATH.LOGIN);
+  };
+
   return (
     <div>
       <div className="flex min-h-screen bg-gray-100">
@@ -23,7 +39,22 @@ export default function DasboardLayout({ children }) {
             </ul>
           </nav>
         </aside>
-        <div className="">{children}</div>
+        <div className="flex-1 flex flex-col">
+          <header className="bg-white p-4 flex justify-end items-center shadow-md">
+            {user && (
+              <div className="flex items-center gap-4">
+                <span className="font-semibold">{user.hoTen}</span>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  onClick={handleLogout}
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            )}
+          </header>
+          <main className="flex-1">{children}</main>
+        </div>
       </div>
     </div>
   );

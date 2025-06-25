@@ -15,6 +15,11 @@ export default function HomeLayout({ children }) {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate(PATH.LOGIN);
+  };
+
   const handleMovieHubClick = () => {
     navigate(PATH.HOME);
   };
@@ -41,12 +46,26 @@ export default function HomeLayout({ children }) {
           <a href="#" className="hover:text-red-400">
             Movies
           </a>
-          <span
-            className="hover:text-red-400 cursor-pointer font-semibold"
-            onClick={handleUserClick}
-          >
-            {user && user.hoTen ? user.hoTen : "Đăng nhập"}
-          </span>
+          {user ? (
+            <>
+              <span className="font-semibold">{user.hoTen}</span>
+              <Button
+                variant="destructive"
+                className="ml-4"
+                onClick={handleLogout}
+              >
+                Đăng xuất
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="outline"
+              className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+              onClick={() => navigate(PATH.LOGIN)}
+            >
+              Đăng nhập
+            </Button>
+          )}
         </nav>
       </header>
 
