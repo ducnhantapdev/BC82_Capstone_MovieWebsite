@@ -7,4 +7,8 @@ export const PATH = {
   USER_MANAGEMENT: "/admin/user-management",
   MOVIE_MANAGEMENT: "/admin/movie-management",
   NOT_FOUND: "*",
+  ADMIN_USER_MANAGEMENT: "/admin/user-management",
+  ADMIN_MOVIE_MANAGEMENT: "/admin/movie-management",
+  ADMIN_MOVIE_ADD: "/admin/movie-management/add",
+  ADMIN_MOVIE_EDIT: "/admin/movie-management/edit/:id",
 };

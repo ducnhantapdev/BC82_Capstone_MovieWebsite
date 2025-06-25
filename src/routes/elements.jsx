@@ -5,6 +5,8 @@ import Register from "@/pages/auth/register";
 import HomePage from "@/pages/home";
 import MovieDetails from "@/pages/movie-details";
 import Ticket from "@/pages/ticket";
+import AddMovie from "@/pages/admin/movie-management/AddMovie";
+import EditMovie from "@/pages/admin/movie-management/EditMovie";
 
 import React from "react";
 import { useRoutes } from "react-router-dom";
@@ -65,6 +67,22 @@ const useRouterElements = () => {
           element: (
             <DashboardLayout>
               <MovieManagement />
+            </DashboardLayout>
+          ),
+        },
+        {
+          path: PATH.ADMIN_MOVIE_ADD,
+          element: (
+            <DashboardLayout>
+              <AddMovie />
+            </DashboardLayout>
+          ),
+        },
+        {
+          path: PATH.ADMIN_MOVIE_EDIT,
+          element: (
+            <DashboardLayout>
+              <EditMovie />
             </DashboardLayout>
           ),
         },

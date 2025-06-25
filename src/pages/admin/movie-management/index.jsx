@@ -7,6 +7,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { FaEdit, FaTrash, FaCalendarAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function MovieManagement() {
   const [page, setPage] = useState(1);
@@ -26,6 +27,7 @@ export default function MovieManagement() {
     maNhom: "GP01",
   });
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data, isLoading, error } = useQuery({
     queryFn: () =>
       listMovieAPI({ soTrang: page, soPhanTuTrenTrang: 10, maNhom: "GP01" }),
@@ -147,22 +149,9 @@ export default function MovieManagement() {
                   <td className="p-3 flex space-x-3 text-lg">
                     <button
                       className="text-blue-600 hover:scale-110 transition"
-                      onClick={() => {
-                        setEditForm({
-                          maPhim: film.maPhim,
-                          tenPhim: film.tenPhim,
-                          trailer: film.trailer,
-                          moTa: film.moTa,
-                          ngayKhoiChieu: film.ngayKhoiChieu?.slice(0, 10) || "",
-                          dangChieu: film.dangChieu,
-                          sapChieu: film.sapChieu,
-                          hot: film.hot,
-                          danhGia: film.danhGia,
-                          hinhAnh: null,
-                          maNhom: film.maNhom || "GP01",
-                        });
-                        setShowEdit(true);
-                      }}
+                      onClick={() =>
+                        navigate(`/admin/movie-management/edit/${film.maPhim}`)
+                      }
                     >
                       <FaEdit />
                     </button>
