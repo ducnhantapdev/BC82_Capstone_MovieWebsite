@@ -4,6 +4,7 @@ import {
   updateMovieAPI,
   addMovieAPI,
 } from "@/apis/movie";
+import { PATH } from "@/routes/path";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { FaEdit, FaTrash, FaCalendarAlt } from "react-icons/fa";
@@ -79,6 +80,10 @@ export default function MovieManagement() {
     const [year, month, day] = dateStr.split("-");
     return `${day}/${month}/${year}`;
   }
+
+  const handleShowTime = (id) => {
+    navigate(PATH.SHOW_TIME / `${id}`);
+  };
 
   return (
     <div>
@@ -164,7 +169,14 @@ export default function MovieManagement() {
                     >
                       <FaTrash />
                     </button>
-                    <button className="text-green-600 hover:scale-110 transition">
+                    <button
+                      className="text-green-600 hover:scale-110 transition"
+                      onClick={() =>
+                        navigate(
+                          `/admin/movie-management/show-time/${film.maPhim}`
+                        )
+                      }
+                    >
                       <FaCalendarAlt />
                     </button>
                   </td>

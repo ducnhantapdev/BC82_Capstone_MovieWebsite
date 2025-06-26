@@ -38,21 +38,6 @@ export default function DasboardLayout({ children }) {
               >
                 Films
               </li>
-              <li
-                className="px-6 py-3 hover:bg-[#1890ff] cursor-pointer"
-                onClick={() => navigate(PATH.ADMIN_MOVIE_ADD)}
-              >
-                Add new
-              </li>
-              <li
-                className="px-6 py-3 hover:bg-[#1890ff] cursor-pointer"
-                onClick={() => navigate(PATH.ADMIN_MOVIE_EDIT)}
-              >
-                Edit Movies
-              </li>
-              <li className="px-6 py-3 hover:bg-[#1890ff] cursor-pointer">
-                Showtime
-              </li>
             </ul>
           </nav>
         </aside>

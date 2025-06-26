@@ -15,6 +15,7 @@ import HomeLayout from "@/components/layouts/home-layout";
 import AuthLayout from "@/components/layouts/auth";
 import DashboardLayout from "@/components/layouts/dashboard";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
+import CreateShowtimeForm from "@/pages/admin/movie-management/showtime";
 
 const useRouterElements = () => {
   const elements = useRoutes([
@@ -83,6 +84,14 @@ const useRouterElements = () => {
           element: (
             <DashboardLayout>
               <EditMovie />
+            </DashboardLayout>
+          ),
+        },
+        {
+          path: "/admin/movie-management/show-time/:id",
+          element: (
+            <DashboardLayout>
+              <CreateShowtimeForm />
             </DashboardLayout>
           ),
         },
