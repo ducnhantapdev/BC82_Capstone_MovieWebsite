@@ -24,11 +24,6 @@ export default function HomeLayout({ children }) {
     navigate(PATH.HOME);
   };
 
-  const handleUserClick = () => {
-    if (user && user.hoTen) return;
-    navigate(PATH.LOGIN);
-  };
-
   return (
     <div className="bg-black text-white min-h-screen font-sans">
       {/* Header */}
@@ -48,7 +43,12 @@ export default function HomeLayout({ children }) {
           </a>
           {user ? (
             <>
-              <span className="font-semibold">{user.hoTen}</span>
+              <span
+                className="font-semibold"
+                onClick={() => navigate("/profile")}
+              >
+                {user.hoTen}
+              </span>
               <Button
                 variant="destructive"
                 className="ml-4"

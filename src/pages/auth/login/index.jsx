@@ -7,6 +7,8 @@ import { useMutation } from "@tanstack/react-query";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setCurrentUser } from "@/redux/slice/user.slice";
 
 import {
   Card,
@@ -36,6 +38,7 @@ export default function Login() {
     mutationFn: loginAuthAPI,
     onSuccess: (data) => {
       localStorage.setItem("user", JSON.stringify(data));
+
       toast.success("đăng nhập thành công");
       if (data.maLoaiNguoiDung === ROLE.ADMIN) {
         setTimeout(() => {

@@ -16,6 +16,7 @@ import AuthLayout from "@/components/layouts/auth";
 import DashboardLayout from "@/components/layouts/dashboard";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
 import CreateShowtimeForm from "@/pages/admin/movie-management/showtime";
+import UserDetail from "@/pages/user-detail";
 
 const useRouterElements = () => {
   const elements = useRoutes([
@@ -48,6 +49,14 @@ const useRouterElements = () => {
       element: (
         <AuthLayout>
           <Register />
+        </AuthLayout>
+      ),
+    },
+    {
+      path: PATH.PROFILE,
+      element: (
+        <AuthLayout>
+          <UserDetail />
         </AuthLayout>
       ),
     },

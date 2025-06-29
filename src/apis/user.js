@@ -13,3 +13,11 @@ export const listMovieAPI = async (data) => {
     throw error;
   }
 };
+
+// Lấy thông tin tài khoản
+export const getUserInfo = (taiKhoan) =>
+  fetcher.post("/QuanLyNguoiDung/ThongTinTaiKhoan", { taiKhoan });
+
+// Cập nhật thông tin tài khoản
+export const updateUserInfo = (data) =>
+  fetcher.put("/QuanLyNguoiDung/CapNhatThongTinNguoiDung", data);
