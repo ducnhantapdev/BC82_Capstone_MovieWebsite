@@ -54,7 +54,6 @@ export default function HomeLayout({ children }) {
 
   return (
     <div className="bg-black text-white min-h-screen font-sans">
-      {/* Header */}
       <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-black via-black/80 to-transparent px-8 py-4 flex justify-between items-center">
         <h1
           className="text-3xl font-bold text-red-600 cursor-pointer hover:text-red-400 transition-colors"
@@ -121,7 +120,6 @@ export default function HomeLayout({ children }) {
           )}
         </nav>
       </header>
-
       {/* <Outlet /> */}
       {children}
       {/* Footer */}
