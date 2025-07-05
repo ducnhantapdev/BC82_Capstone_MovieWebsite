@@ -17,11 +17,18 @@ export default function DasboardLayout({ children }) {
     navigate(PATH.LOGIN);
   };
 
+  const handleHome = () => {
+    navigate(PATH.HOME);
+  };
+
   return (
     <div>
       <div className="flex min-h-screen bg-gray-100">
         <aside className="w-64 bg-[#001529] text-white">
-          <div className="p-4 font-bold text-xl border-b border-gray-700">
+          <div
+            className="p-4 font-bold text-xl border-b border-gray-700 cursor-pointer"
+            onClick={() => handleHome()}
+          >
             CYBERLEARN
           </div>
           <nav className="mt-4">

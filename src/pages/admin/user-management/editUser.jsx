@@ -13,12 +13,12 @@ const EditUserForm = ({ user, onClose, onSave }) => {
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username || "",
-        password: "",
-        fullName: user.fullName || "",
+        username: user.taiKhoan || "",
+        password: user.matKhau || "",
+        fullName: user.hoTen || "",
         email: user.email || "",
-        phone: user.phone || "",
-        userType: user.userType || "KhachHang",
+        phone: user.soDT || "",
+        userType: user.loaiKH || "KhachHang",
       });
     } else {
       setFormData({
@@ -37,7 +37,16 @@ const EditUserForm = ({ user, onClose, onSave }) => {
   };
 
   const handleSubmit = () => {
-    onSave(formData);
+    // Chuyển đổi tên trường về đúng với backend
+    const submitData = {
+      taiKhoan: formData.taiKhoan,
+      matKhau: formData.matKhau,
+      hoTen: formData.hoTen,
+      email: formData.email,
+      soDt: formData.soDT,
+      maLoaiNguoiDung: formData.loaiKH,
+    };
+    onSave(submitData);
   };
 
   return (
@@ -54,6 +63,7 @@ const EditUserForm = ({ user, onClose, onSave }) => {
             className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
             value={formData.username}
             onChange={handleChange}
+            disabled={!!user}
           />
         </div>
         <div>

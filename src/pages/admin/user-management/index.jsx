@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { listMovieAPI } from "@/apis/user";
+import { listMovieAPI, updateUserInfo } from "@/apis/user";
 import { registerAuthAPI } from "@/apis/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaEdit } from "react-icons/fa";
+import EditUserForm from "./editUser";
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [form, setForm] = useState({
     taiKhoan: "",
     matKhau: "",
@@ -48,6 +52,18 @@ export default function UserManagement() {
     }
   };
 
+  const handleEditUser = async (formData) => {
+    try {
+      await updateUserInfo(formData);
+      toast.success("Cập nhật tài khoản thành công!");
+      setShowEdit(false);
+      setSelectedUser(null);
+      fetchUsers();
+    } catch {
+      toast.error("Cập nhật tài khoản thất bại!");
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 mt-10 bg-white rounded shadow">
       <div className="flex justify-between items-center mb-6">
@@ -66,6 +82,8 @@ export default function UserManagement() {
             <th className="p-2 border">Họ tên</th>
             <th className="p-2 border">Email</th>
             <th className="p-2 border">Số ĐT</th>
+            <th className="p-2 border">Mật khẩu</th>
+            <th className="p-2 border">Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -74,7 +92,18 @@ export default function UserManagement() {
               <td className="p-2 border">{user.taiKhoan}</td>
               <td className="p-2 border">{user.hoTen}</td>
               <td className="p-2 border">{user.email}</td>
-              <td className="p-2 border">{user.soDt}</td>
+              <td className="p-2 border">{user.matKhau}</td>
+              <td className="p-2 border">{user.soDT}</td>
+              <td className="p-2 border">
+                <button
+                  onClick={() => {
+                    setSelectedUser(user);
+                    setShowEdit(true);
+                  }}
+                >
+                  <FaEdit />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -136,6 +165,19 @@ export default function UserManagement() {
               Tạo tài khoản
             </Button>
           </form>
+        </div>
+      )}
+      {/* Modal chỉnh sửa tài khoản */}
+      {showEdit && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <EditUserForm
+            user={selectedUser}
+            onClose={() => {
+              setShowEdit(false);
+              setSelectedUser(null);
+            }}
+            onSave={handleEditUser}
+          />
         </div>
       )}
       <ToastContainer />

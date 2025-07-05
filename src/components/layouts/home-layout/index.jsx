@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { PATH } from "@/routes/path";
-import React from "react";
+import React, { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { ROLE } from "@/constants/role";
 
 export default function HomeLayout({ children }) {
   const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [timeoutId, setTimeoutId] = useState(null);
 
   // Lấy user từ localStorage
   const user = React.useMemo(() => {
@@ -22,6 +25,31 @@ export default function HomeLayout({ children }) {
 
   const handleMovieHubClick = () => {
     navigate(PATH.HOME);
+  };
+
+  const handleProfileClick = () => {
+    navigate("/profile");
+    setShowDropdown(false);
+  };
+
+  const handleDashboardClick = () => {
+    navigate("/admin/user-management");
+    setShowDropdown(false);
+  };
+
+  const handleMouseEnter = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
+    setShowDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    const id = setTimeout(() => {
+      setShowDropdown(false);
+    }, 150);
+    setTimeoutId(id);
   };
 
   return (
@@ -43,12 +71,37 @@ export default function HomeLayout({ children }) {
           </a>
           {user ? (
             <>
-              <span
-                className="font-semibold"
-                onClick={() => navigate("/profile")}
+              <div
+                className="relative inline-block"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
-                {user.hoTen}
-              </span>
+                <span className="font-semibold cursor-pointer hover:text-red-400">
+                  {user.hoTen}
+                </span>
+                {showDropdown && (
+                  <div
+                    className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-600 text-white rounded-lg shadow-xl py-2 z-50"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <button
+                      className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-700 transition-colors duration-200"
+                      onClick={handleProfileClick}
+                    >
+                      Profile
+                    </button>
+                    {user.maLoaiNguoiDung === ROLE.ADMIN && (
+                      <button
+                        className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-700 transition-colors duration-200"
+                        onClick={handleDashboardClick}
+                      >
+                        Dashboard
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
               <Button
                 variant="destructive"
                 className="ml-4"

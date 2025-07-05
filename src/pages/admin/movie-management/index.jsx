@@ -81,10 +81,6 @@ export default function MovieManagement() {
     return `${day}/${month}/${year}`;
   }
 
-  const handleShowTime = (id) => {
-    navigate(PATH.SHOW_TIME / `${id}`);
-  };
-
   return (
     <div>
       {" "}

@@ -55,9 +55,9 @@ const useRouterElements = () => {
     {
       path: PATH.PROFILE,
       element: (
-        <AuthLayout>
+        <HomeLayout>
           <UserDetail />
-        </AuthLayout>
+        </HomeLayout>
       ),
     },
     {
