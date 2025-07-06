@@ -45,9 +45,7 @@ export const deleteMovieAPI = async (maPhim) => {
 export const updateMovieAPI = async (data) => {
   // data: {maPhim, tenPhim, trailer, moTa, ngayKhoiChieu, dangChieu, sapChieu, hot, danhGia, hinhAnh, maNhom}
   try {
-    const response = await fetcher.post("QuanLyPhim/CapNhatPhimUpload", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const response = await fetcher.post("QuanLyPhim/CapNhatPhimUpload", data);
     return response.data.content;
   } catch (error) {
     console.error("Error updating movie:", error);

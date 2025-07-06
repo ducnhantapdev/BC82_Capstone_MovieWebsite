@@ -29,3 +29,8 @@ export const addUser = (taiKhoan) => {
 export const updateUserInfo = (data) => {
   return fetcher.put("/QuanLyNguoiDung/CapNhatThongTinNguoiDung", data);
 };
+
+// tìm kiếm user
+export const searchUser = (name) => {
+  return fetcher.get(`/QuanLyNguoiDung/TimKiemNguoiDung?tuKhoa=${name}`);
+};

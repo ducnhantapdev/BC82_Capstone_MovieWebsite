@@ -6,8 +6,7 @@ import { FaEdit } from "react-icons/fa";
 
 export default function UserDetail() {
   const [user, setUser] = useState(null);
-  const [edit, setEdit] = useState(false);
-  const [updateMessage, setUpdateMessage] = useState("");
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -41,15 +40,12 @@ export default function UserDetail() {
         );
         queryClient.invalidateQueries(["profile", user.taiKhoan]);
       }
-      setEdit(false);
-      setUpdateMessage("Cập nhật thành công!");
+
       setTimeout(() => {
         navigate("/");
       }, 3000);
     },
-    onError: () => {
-      setUpdateMessage("Cập nhật thất bại!");
-    },
+    onError: () => {},
   });
 
   if (!user) return null;
@@ -74,14 +70,6 @@ export default function UserDetail() {
             <div className="text-3xl font-extrabold text-blue-700">
               {user.hoTen}
             </div>
-            <button
-              type="button"
-              className="text-blue-500 hover:text-blue-700"
-              title="Chỉnh sửa thông tin"
-              onClick={() => setEdit(true)}
-            >
-              <FaEdit size={22} />
-            </button>
           </div>
           <div className="text-gray-500 text-lg">@{user.taiKhoan}</div>
           <div className="mt-2 flex flex-wrap gap-2 justify-center md:justify-start">
