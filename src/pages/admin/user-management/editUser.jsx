@@ -1,27 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { updateUserInfo } from "@/apis/user";
+import { toast } from "react-toastify";
 
 const EditUserForm = ({ user, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    fullName: "",
-    email: "",
-    phone: "",
-    userType: "KhachHang",
+  console.log(user);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      username: "",
+      password: "",
+      fullName: "",
+      email: "",
+      phone: "",
+      userType: "KhachHang",
+    },
   });
 
   useEffect(() => {
     if (user) {
-      setFormData({
+      console.log("data edit", user);
+      reset({
         username: user.taiKhoan || "",
         password: user.matKhau || "",
         fullName: user.hoTen || "",
         email: user.email || "",
         phone: user.soDT || "",
-        userType: user.loaiKH || "KhachHang",
+        userType: user.maLoaiNguoiDung || "KhachHang",
       });
     } else {
-      setFormData({
+      reset({
         username: "",
         password: "",
         fullName: "",
@@ -30,23 +42,26 @@ const EditUserForm = ({ user, onClose, onSave }) => {
         userType: "KhachHang",
       });
     }
-  }, [user]);
+  }, [user, reset]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = () => {
-    // Chuyển đổi tên trường về đúng với backend
+  const onSubmit = async (data) => {
     const submitData = {
-      taiKhoan: formData.taiKhoan,
-      matKhau: formData.matKhau,
-      hoTen: formData.hoTen,
-      email: formData.email,
-      soDt: formData.soDT,
-      maLoaiNguoiDung: formData.loaiKH,
+      taiKhoan: data.username,
+      matKhau: data.password,
+      hoTen: data.fullName,
+      email: data.email,
+      soDT: data.phone,
+      maNhom: "GP01",
+      maLoaiNguoiDung: data.userType,
     };
-    onSave(submitData);
+    try {
+      await updateUserInfo(submitData);
+      toast.success("Cập nhật tài khoản thành công!");
+      if (onSave) onSave(submitData);
+      if (onClose) onClose();
+    } catch (error) {
+      toast.error("Cập nhật thất bại!", error);
+    }
   };
 
   return (
@@ -54,86 +69,104 @@ const EditUserForm = ({ user, onClose, onSave }) => {
       <h2 className="text-xl font-semibold mb-6">
         {user ? "Chỉnh sửa người dùng" : "Thêm người dùng"}
       </h2>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium">Tài khoản</label>
-          <input
-            type="text"
-            name="username"
-            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-            value={formData.username}
-            onChange={handleChange}
-            disabled={!!user}
-          />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium">Tài khoản</label>
+            <input
+              type="text"
+              {...register("username", { required: "Vui lòng nhập tài khoản" })}
+              className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+              disabled={!!user}
+            />
+            {errors.username && (
+              <span className="text-red-500 text-xs">
+                {errors.username.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Email</label>
+            <input
+              type="email"
+              {...register("email", { required: "Vui lòng nhập email" })}
+              className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            />
+            {errors.email && (
+              <span className="text-red-500 text-xs">
+                {errors.email.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Mật khẩu</label>
+            <input
+              type="password"
+              {...register("password", { required: "Vui lòng nhập mật khẩu" })}
+              className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            />
+            {errors.password && (
+              <span className="text-red-500 text-xs">
+                {errors.password.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Số điện thoại</label>
+            <input
+              type="text"
+              {...register("phone", {
+                required: "Vui lòng nhập số điện thoại",
+              })}
+              className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            />
+            {errors.phone && (
+              <span className="text-red-500 text-xs">
+                {errors.phone.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Họ tên</label>
+            <input
+              type="text"
+              {...register("fullName", { required: "Vui lòng nhập họ tên" })}
+              className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            />
+            {errors.fullName && (
+              <span className="text-red-500 text-xs">
+                {errors.fullName.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Loại người dùng</label>
+            <select
+              {...register("userType", { required: true })}
+              className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            >
+              <option value="KhachHang">Khách Hàng</option>
+              <option value="QuanTri">Quản Trị</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium">Email</label>
-          <input
-            type="email"
-            name="email"
-            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Mật khẩu</label>
-          <input
-            type="password"
-            name="password"
-            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-            value={formData.password}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Số điện thoại</label>
-          <input
-            type="text"
-            name="phone"
-            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Họ tên</label>
-          <input
-            type="text"
-            name="fullName"
-            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-            value={formData.fullName}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Loại người dùng</label>
-          <select
-            name="userType"
-            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-            value={formData.userType}
-            onChange={handleChange}
-          >
-            <option value="KhachHang">Khách Hàng</option>
-            <option value="QuanTri">Quản Trị</option>
-          </select>
-        </div>
-      </div>
 
-      <div className="flex items-center gap-4 mt-6">
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          onClick={handleSubmit}
-        >
-          {user ? "Lưu" : "Thêm"}
-        </button>
-        <button
-          className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-          onClick={onClose}
-        >
-          Đóng
-        </button>
-      </div>
+        <div className="flex items-center gap-4 mt-6">
+          <button
+            type="submit"
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            {user ? "Lưu" : "Thêm"}
+          </button>
+          <button
+            type="button"
+            className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+            onClick={onClose}
+          >
+            Đóng
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

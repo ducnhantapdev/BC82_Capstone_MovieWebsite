@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { listMovieAPI, updateUserInfo } from "@/apis/user";
-import { registerAuthAPI } from "@/apis/auth";
+import { addUser, listUserAPI, updateUserInfo } from "@/apis/user";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ToastContainer, toast } from "react-toastify";
@@ -18,6 +18,8 @@ export default function UserManagement() {
     matKhau: "",
     email: "",
     soDt: "",
+    maNhom: "",
+    maLoaiNguoiDung: "",
     hoTen: "",
   });
 
@@ -27,7 +29,7 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const data = await listMovieAPI();
+      const data = await listUserAPI();
       setUsers(data);
     } catch {
       toast.error("Không thể lấy danh sách user!");
@@ -42,10 +44,18 @@ export default function UserManagement() {
   const handleAddUser = async (e) => {
     e.preventDefault();
     try {
-      await registerAuthAPI({ ...form, maNhom: "GP01" });
+      await addUser({ ...form });
       toast.success("Tạo tài khoản thành công!");
       setShowAdd(false);
-      setForm({ taiKhoan: "", matKhau: "", email: "", soDt: "", hoTen: "" });
+      setForm({
+        taiKhoan: "",
+        matKhau: "",
+        email: "",
+        soDt: "",
+        hoTen: "",
+        maNhom: "",
+        maLoaiNguoiDung: "",
+      });
       fetchUsers();
     } catch {
       toast.error("Tạo tài khoản thất bại!");
@@ -55,6 +65,7 @@ export default function UserManagement() {
   const handleEditUser = async (formData) => {
     try {
       await updateUserInfo(formData);
+      console.log(formData);
       toast.success("Cập nhật tài khoản thành công!");
       setShowEdit(false);
       setSelectedUser(null);
@@ -79,10 +90,11 @@ export default function UserManagement() {
         <thead>
           <tr className="bg-gray-100">
             <th className="p-2 border">Tài khoản</th>
-            <th className="p-2 border">Họ tên</th>
+            <th className="p-2 border">Mật khẩu</th>
             <th className="p-2 border">Email</th>
             <th className="p-2 border">Số ĐT</th>
-            <th className="p-2 border">Mật khẩu</th>
+            <th className="p-2 border">Mã ND</th>
+            <th className="p-2 border">Họ tên</th>
             <th className="p-2 border">Hành động</th>
           </tr>
         </thead>
@@ -90,10 +102,11 @@ export default function UserManagement() {
           {users.map((user) => (
             <tr key={user.taiKhoan} className="border-t">
               <td className="p-2 border">{user.taiKhoan}</td>
-              <td className="p-2 border">{user.hoTen}</td>
-              <td className="p-2 border">{user.email}</td>
               <td className="p-2 border">{user.matKhau}</td>
+              <td className="p-2 border">{user.email}</td>
               <td className="p-2 border">{user.soDT}</td>
+              <td className="p-2 border">{user.maLoaiNguoiDung}</td>
+              <td className="p-2 border">{user.hoTen}</td>
               <td className="p-2 border">
                 <button
                   onClick={() => {
@@ -131,12 +144,14 @@ export default function UserManagement() {
               required
             />
             <Input
-              placeholder="Họ và tên"
-              name="hoTen"
-              value={form.hoTen}
+              type="password"
+              placeholder="Mật khẩu"
+              name="matKhau"
+              value={form.matKhau}
               onChange={handleChange}
               required
             />
+
             <Input
               type="email"
               placeholder="Email"
@@ -145,19 +160,34 @@ export default function UserManagement() {
               onChange={handleChange}
               required
             />
-            <Input
-              type="password"
-              placeholder="Mật khẩu"
-              name="matKhau"
-              value={form.matKhau}
-              onChange={handleChange}
-              required
-            />
+
             <Input
               type="tel"
               placeholder="Số điện thoại"
               name="soDt"
               value={form.soDt}
+              onChange={handleChange}
+              required
+            />
+
+            <Input
+              placeholder="Mã nhóm"
+              name="maNhom"
+              value={form.maNhom}
+              onChange={handleChange}
+              required
+            />
+            <Input
+              placeholder="Mã người dung"
+              name="maLoaiNguoiDung"
+              value={form.maLoaiNguoiDung}
+              onChange={handleChange}
+              required
+            />
+            <Input
+              placeholder="Họ và tên"
+              name="hoTen"
+              value={form.hoTen}
               onChange={handleChange}
               required
             />

@@ -1,6 +1,6 @@
 import fetcher from "./fetcher";
 
-export const listMovieAPI = async (data) => {
+export const listUserAPI = async (data) => {
   //data: {soTrang:1, soPhanTuTrenTrang: 10, maNhom=GP01}
   try {
     const response = await fetcher.get(
@@ -18,6 +18,13 @@ export const listMovieAPI = async (data) => {
 export const getUserInfo = (taiKhoan) =>
   fetcher.post("/QuanLyNguoiDung/ThongTinTaiKhoan", { taiKhoan });
 
+//thêm tài khoản
+export const addUser = (taiKhoan) => {
+  console.log("tai khoan", taiKhoan);
+  return fetcher.post("/QuanLyNguoiDung/ThemNguoiDung", taiKhoan);
+};
+
 // Cập nhật thông tin tài khoản
-export const updateUserInfo = (data) =>
-  fetcher.put("/QuanLyNguoiDung/CapNhatThongTinNguoiDung", data);
+export const updateUserInfo = (data) => {
+  return fetcher.put("/QuanLyNguoiDung/CapNhatThongTinNguoiDung", data);
+};

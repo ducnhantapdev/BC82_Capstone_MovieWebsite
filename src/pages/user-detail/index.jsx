@@ -5,26 +5,28 @@ import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 
 export default function UserDetail() {
-  // Lấy user từ localStorage
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(null);
   const [edit, setEdit] = useState(false);
   const [updateMessage, setUpdateMessage] = useState("");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
+    // Lấy tài khoản từ localStorage (nếu là profile cá nhân)
+    const userLocal = JSON.parse(localStorage.getItem("user"));
+    const taiKhoan = userLocal?.taiKhoan;
+    if (taiKhoan) {
+      getUserInfo(taiKhoan).then((res) => {
+        setUser(res.data.content); // hoặc setUser(res.content) tùy theo API trả về
+      });
     }
-  }, [user, navigate]);
+  }, []);
 
   const { data, isLoading } = useQuery({
     queryKey: ["profile", user?.taiKhoan],
     queryFn: () => getUserInfo(user.taiKhoan),
     enabled: !!user,
   });
-
-  console.log("user", user);
 
   const mutation = useMutation({
     mutationFn: updateUserInfo,
@@ -224,12 +226,12 @@ export default function UserDetail() {
         <h2 className="text-xl font-bold mb-4 text-blue-600 border-b pb-2">
           Lịch sử đặt vé
         </h2>
-        {info.thongTinDatVe && info.thongTinDatVe.length > 0 ? (
+        {user.thongTinDatVe && user.thongTinDatVe.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {info.thongTinDatVe.map((ve, idx) => (
+            {user.thongTinDatVe.map((ve, idx) => (
               <div
                 key={idx}
-                className="border rounded-lg p-4 bg-blue-50 shadow flex flex-col gap-2"
+                className="border rounded-lg p-4 bg-blue-50 text-black shadow flex flex-col gap-2"
               >
                 <div className="font-bold text-blue-700 text-lg">
                   {ve.tenPhim}
