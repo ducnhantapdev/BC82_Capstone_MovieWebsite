@@ -15,8 +15,9 @@ export const listUserAPI = async (data) => {
 };
 
 // Lấy thông tin tài khoản
-export const getUserInfo = (taiKhoan) =>
-  fetcher.post("/QuanLyNguoiDung/ThongTinTaiKhoan", { taiKhoan });
+export const getUserInfo = (taiKhoan) => {
+  return fetcher.post("/QuanLyNguoiDung/ThongTinTaiKhoan", { taiKhoan });
+};
 
 //thêm tài khoản
 export const addUser = (taiKhoan) => {

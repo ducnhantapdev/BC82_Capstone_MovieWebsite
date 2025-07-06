@@ -17,6 +17,7 @@ export default function UserDetail() {
     const taiKhoan = userLocal?.taiKhoan;
     if (taiKhoan) {
       getUserInfo(taiKhoan).then((res) => {
+        console.log("res.data.content", res.data.content);
         setUser(res.data.content); // hoặc setUser(res.content) tùy theo API trả về
       });
     }
@@ -33,6 +34,7 @@ export default function UserDetail() {
     onSuccess: async () => {
       if (user) {
         const freshUser = await getUserInfo(user.taiKhoan);
+
         localStorage.setItem(
           "user",
           JSON.stringify(freshUser.data.content || freshUser)
@@ -109,7 +111,8 @@ export default function UserDetail() {
             <span className="font-semibold">Email:</span> {user.email}
           </div>
           <div>
-            <span className="font-semibold">Số điện thoại:</span> {user.soDT}
+            <span className="font-semibold">Số điện thoại:</span>
+            {user.soDt || user.soDT}
           </div>
 
           {user.ngayTao && (
@@ -125,101 +128,7 @@ export default function UserDetail() {
             </div>
           )}
         </div>
-        <button
-          className="mt-6 bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow hover:scale-105 transition"
-          onClick={() => setEdit(true)}
-        >
-          Chỉnh sửa thông tin
-        </button>
       </div>
-
-      {/* Form chỉnh sửa */}
-      {edit && (
-        <form
-          className="mb-8 bg-white text-black p-6 rounded-xl shadow-lg border"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setUpdateMessage("");
-            const formData = new FormData(e.target);
-            mutation.mutate({
-              taiKhoan: user.taiKhoan,
-              matKhau: formData.get("matKhau"),
-              email: formData.get("email"),
-              soDt: formData.get("soDT"),
-              hoTen: formData.get("hoTen"),
-              maLoaiNguoiDung: user.maLoaiNguoiDung,
-              maNhom: user.maNhom || "GP01",
-            });
-          }}
-        >
-          {/* Thông báo thành công/thất bại */}
-          {updateMessage && (
-            <div
-              className={`mb-4 font-semibold ${
-                updateMessage.includes("thất bại")
-                  ? "text-red-600"
-                  : "text-green-600"
-              }`}
-            >
-              {updateMessage}
-            </div>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-semibold mb-1">Họ tên</label>
-              <input
-                name="hoTen"
-                defaultValue={user.hoTen}
-                className="border p-2 w-full rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Email</label>
-              <input
-                name="email"
-                defaultValue={user.email}
-                className="border p-2 w-full rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">
-                Số điện thoại
-              </label>
-              <input
-                name="soDt"
-                defaultValue={user.soDT}
-                className="border p-2 w-full rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">
-                Mật khẩu mới
-              </label>
-              <input
-                name="matKhau"
-                type="password"
-                placeholder="Nhập mật khẩu mới"
-                className="border p-2 w-full rounded"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button
-              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded font-bold"
-              type="submit"
-            >
-              Lưu
-            </button>
-            <button
-              className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded font-bold"
-              onClick={() => setEdit(false)}
-              type="button"
-            >
-              Hủy
-            </button>
-          </div>
-        </form>
-      )}
 
       {/* Lịch sử đặt vé */}
       <div className="bg-white rounded-xl shadow p-6">
