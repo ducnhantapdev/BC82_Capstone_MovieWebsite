@@ -23,8 +23,8 @@ export default function Register() {
     onSuccess: () => {
       toast.success("Đăng ký thành công!");
       setTimeout(() => {
-        navigate(PATH.HOME);
-      }, 1500); // 1 giây
+        navigate("/auth/login");
+      }, 1500); // 1.5 giây
       setForm({
         taiKhoan: "",
         matKhau: "",
